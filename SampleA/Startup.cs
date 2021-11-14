@@ -36,6 +36,8 @@ namespace SampleA
                 app.UseDeveloperExceptionPage();
             }
 
+            app.UseCorrelationId();
+
             app.UseHttpsRedirection();
 
             app.UseRouting();
