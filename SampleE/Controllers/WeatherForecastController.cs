@@ -3,7 +3,8 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
+using System.Net.Http;
+using System.Text.Json;
 
 namespace SampleE.Controllers
 {
@@ -26,6 +27,11 @@ namespace SampleE.Controllers
         [HttpGet]
         public IEnumerable<WeatherForecast> Get()
         {
+            var getBeforeCollerationHeader = HttpContext.Request.Headers
+                .FirstOrDefault(i => i.Key.ToLower().Contains("Correlation".ToLower()));
+
+            _logger.LogInformation(JsonSerializer.Serialize(getBeforeCollerationHeader));
+
             var rng = new Random();
             return Enumerable.Range(1, 5).Select(index => new WeatherForecast
             {
