@@ -30,6 +30,14 @@ namespace SampleA.Controllers
         [HttpGet]
         public IEnumerable<WeatherForecast> Get()
         {
+            // FAIL
+            //var client = new HttpClient();
+            //var getResponse = client.GetAsync("https://localhost:6001/weatherforecast");
+
+            // FAIL
+            //var client = _httpClientFactory.CreateClient("CorrelationSamples");
+            //var getResponse = client.GetAsync("https://localhost:6001/weatherforecast");
+
             var client = _httpClientFactory.CreateClient("CorrelationSample");
             var getResponse = client.GetAsync("https://localhost:6001/weatherforecast");
 
