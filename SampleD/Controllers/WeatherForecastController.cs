@@ -18,31 +18,20 @@ namespace SampleD.Controllers
         };
 
         private readonly ILogger<WeatherForecastController> _logger;
+        private readonly IHttpClientFactory _httpClientFactory;
 
-        public WeatherForecastController(ILogger<WeatherForecastController> logger)
+        public WeatherForecastController(ILogger<WeatherForecastController> logger
+            , IHttpClientFactory httpClientFactory)
         {
             _logger = logger;
+            _httpClientFactory = httpClientFactory;
         }
 
         [HttpGet]
         public IEnumerable<WeatherForecast> Get()
         {
-            var getBeforeCollerationHeader = HttpContext.Request.Headers
-                .FirstOrDefault(i => i.Key.ToLower().Contains("Correlation".ToLower()));
-
-            _logger.LogInformation(JsonSerializer.Serialize(getBeforeCollerationHeader));
-
-            var client = new HttpClient
-            {
-                BaseAddress = new Uri("https://localhost:9001")
-            };
-            var request = client.GetAsync("weatherforecast");
-
-            var getafterCollerationHeader = HttpContext.Request.Headers
-                .FirstOrDefault(i => i.Key.ToLower().Contains("Correlation".ToLower()));
-
-            _logger.LogInformation(JsonSerializer.Serialize(getafterCollerationHeader));
-
+            var client = _httpClientFactory.CreateClient("CorrelationSample");
+            var getResponse = client.GetAsync("https://localhost:9001/weatherforecast");
 
             var rng = new Random();
             return Enumerable.Range(1, 5).Select(index => new WeatherForecast
