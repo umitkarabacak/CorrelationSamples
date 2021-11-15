@@ -1,5 +1,6 @@
 using CorrelationId;
 using CorrelationId.DependencyInjection;
+using CorrelationId.HttpClient;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -23,6 +24,8 @@ namespace SampleE
             services.AddControllers();
 
             services.AddDefaultCorrelationId();
+
+            services.AddHttpClient("CorrelationSample").AddCorrelationIdForwarding();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

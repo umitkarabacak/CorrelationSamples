@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace SampleA.Controllers
 {
@@ -26,40 +25,33 @@ namespace SampleA.Controllers
         }
 
         [HttpGet]
-        public async Task<IEnumerable<WeatherForecast>> Get()
+        public IEnumerable<WeatherForecast> Get()
         {
+            var getBeforeCollerationHeader = HttpContext.Request.Headers
+                .FirstOrDefault(i => i.Key.ToLower().Contains("Correlation".ToLower()));
+
+            _logger.LogInformation(JsonSerializer.Serialize(getBeforeCollerationHeader));
+
+            var client = new HttpClient
+            {
+                BaseAddress = new Uri("https://localhost:6001")
+            };
+            var request = client.GetAsync("weatherforecast");
+
+            var getafterCollerationHeader = HttpContext.Request.Headers
+                .FirstOrDefault(i => i.Key.ToLower().Contains("Correlation".ToLower()));
+
+            _logger.LogInformation(JsonSerializer.Serialize(getafterCollerationHeader));
+
+
             var rng = new Random();
-            var result = Enumerable.Range(1, 5).Select(index => new WeatherForecast
+            return Enumerable.Range(1, 5).Select(index => new WeatherForecast
             {
                 Date = DateTime.Now.AddDays(index),
                 TemperatureC = rng.Next(-20, 55),
                 Summary = Summaries[rng.Next(Summaries.Length)]
             })
             .ToArray();
-
-            var beforeRequestHeaderKeys = HttpContext.Request.Headers.Select(i => i.Key).ToList();
-            var beforeResponseHeaderKeys = HttpContext.Response.Headers.Select(i => i.Key).ToList();
-
-            var client = new HttpClient()
-            {
-                BaseAddress = new Uri("https://localhost:6001"),
-            };
-            var response = await client.GetAsync("weatherforecast");
-
-            var afterRequestHeaderKeys = HttpContext.Request.Headers.Select(i => i.Key).ToList();
-            var afterResponseHeaderKeys = HttpContext.Response.Headers.Select(i => i.Key).ToList();
-
-            var responseData = new
-            {
-                beforeRequestHeaderKeys,
-                beforeResponseHeaderKeys,
-                afterRequestHeaderKeys,
-                afterResponseHeaderKeys,
-            };
-
-            _logger.LogInformation(JsonSerializer.Serialize(responseData));
-
-            return result;
         }
     }
 }
